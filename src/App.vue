@@ -1,43 +1,77 @@
 <script setup>
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import Greet from "./components/Greet.vue";
+import { ref } from "vue";
+import { getSummonerByName, getCurrentSummoner, getParameter, refreshParameter, connect, getChampSelectSession, getMatchHistoryByPuuid, getMatchById } from "./api"
+
+let token = ref("");
+let port = ref(0);
+
+async function f1() {
+  let lp = await getParameter();
+  token.value = lp.token;
+  port.value = lp.port;
+}
+
+async function f2() {
+  await refreshParameter();
+}
+
+async function f3() {
+  await connect();
+}
+
+async function f4() {
+  await getChampSelectSession();
+}
+
+async function f5() {
+  await getCurrentSummoner();
+}
+
+let name_input = ref("");
+async function f6() {
+  console.log(name_input.value);
+  await getSummonerByName(name_input.value);
+}
+
+let puuid = ref("");
+let beg = ref(0);
+let end = ref(0);
+async function f7() {
+  console.log(name_input.value);
+  await getMatchHistoryByPuuid(puuid.value, beg.value, end.value);
+}
+
+let match_id = ref(0);
+async function f8() {
+  await getMatchById(match_id.value);
+}
+
+
 </script>
 
 <template>
   <div class="container">
-    <h1>Welcome to Tauri!</h1>
-
-    <div class="row">
-      <a href="https://vitejs.dev" target="_blank">
-        <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-      </a>
-      <a href="https://tauri.app" target="_blank">
-        <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-      </a>
-      <a href="https://vuejs.org/" target="_blank">
-        <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-      </a>
+    <button @click="f1">getParameter</button>
+    <p> {{ token }}</p>
+    <p> {{ port }}</p>
+    <button @click="f2">refreshParameter</button>
+    <button @click="f3">connect</button>
+    <button @click="f4">getChampSelectSession</button>
+    <button @click="f5">getCurrentSummoner</button>
+    <input type="text" v-model="name_input">
+    <button @click="f6">getSummonerByName</button>
+    <div>
+      <input type="text" v-model="puuid">
+      <input type="number" v-model="beg">
+      <input type="number" v-model="end">
     </div>
+    <button @click="f7">getMatchHistoryByPuuid</button>
+    <input type="number" v-model="match_id">
+    <button @click="f8">getMatchById</button>
 
-    <p>Click on the Tauri, Vite, and Vue logos to learn more.</p>
 
-    <p>
-      Recommended IDE setup:
-      <a href="https://code.visualstudio.com/" target="_blank">VS Code</a>
-      +
-      <a href="https://github.com/johnsoncodehk/volar" target="_blank">Volar</a>
-      +
-      <a href="https://github.com/tauri-apps/tauri-vscode" target="_blank"
-        >Tauri</a
-      >
-      +
-      <a href="https://github.com/rust-lang/rust-analyzer" target="_blank"
-        >rust-analyzer</a
-      >
-    </p>
-
-    <Greet />
   </div>
 </template>
 
