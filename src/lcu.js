@@ -100,8 +100,3 @@ export async function launchSpectate(puuid) {
 export async function testAndSetCer() {
     return await invoke("test_and_set_cer");
 }
-
-export async function getChampSelectSession() {
-    let res = await invoke("get_champ_select_session");
-    return res;
-}

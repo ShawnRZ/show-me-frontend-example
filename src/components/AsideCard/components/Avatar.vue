@@ -1,16 +1,34 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { ElNotification } from 'element-plus';
 import { listen } from "@tauri-apps/api/event";
 import { useRouter } from 'vue-router';
 
 import { refreshParameter, getCurrentSummoner, connect } from '@/lcu';
+import { useMetadataStore } from '@/stores/metadata';
 
 const Router = useRouter();
+const metadataStore = useMetadataStore();
+const getProfileIcon = metadataStore.getProfileIconPath;
+
+// 召唤师
+const summoner = ref(null);
+
 // 召唤师名
-const name = ref('点击头像连接到客户端');
+const name = computed(() => {
+    if (!summoner.value) {
+        return '点击连接客户端';
+    }
+    return summoner.value.displayName;
+});
+
 // 召唤师头像URL
-const avatar = ref('https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/29.jpg');
+const profileIcon = computed(() => {
+    if (!summoner.value) {
+        return getProfileIcon(29);
+    }
+    return getProfileIcon(summoner.value.profileIconId);
+});
 // 是否离线
 const offline = ref(true);
 
@@ -18,6 +36,13 @@ const offline = ref(true);
  * 复制自己的ID到粘贴板
  */
 const copyMyName = () => {
+    if (!summoner.value) {
+        ElNotification.info({
+            title: '尚未连接客户端',
+            position: 'bottom-right',
+        })
+        return;
+    }
     navigator.clipboard.writeText(name.value).then(() => {
         ElNotification.success({
             title: '提示',
@@ -54,17 +79,15 @@ async function reConnectToClient() {
      * 重新获取当前召唤师信息
      */
     try {
-        let cs = await getCurrentSummoner();
+        // 更新当前召唤师信息
+        summoner.value = await getCurrentSummoner();
         // 重置当前路径
         Router.push({
             path: '/search',
             query: {
-                name: cs.displayName,
+                name: name.value,
             }
         });
-        // 更新当前召唤师信息
-        name.value = cs.displayName;
-        avatar.value = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${cs.profileIconId}.jpg`;
     } catch (err) {
         ElNotification.error({
             title: "获取当前玩家信息失败",
@@ -106,8 +129,7 @@ async function reConnectToClient() {
             message: "连接已断开，请重新连接",
             position: "bottom-right"
         });
-        name.value = '点击头像连接到客户端';
-        avatar.value = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/29.jpg';
+        summoner.value = null;
         cc();
     });
     /**
@@ -125,7 +147,7 @@ async function reConnectToClient() {
 
 <template>
     <div class="avatar">
-        <el-avatar :size="50" :src="avatar" @click="reConnectToClient()" />
+        <el-avatar :size="50" :src="profileIcon" @click="reConnectToClient()" />
         <div :class="['status', offline ? 'offline' : '']"></div>
         <div class="name">
             <el-tooltip :content="name">

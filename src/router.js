@@ -1,14 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 
-import Home from '@/mainCard/components/home/index.vue';
-import About from '@/mainCard/components/about/index.vue';
-import Search from '@/mainCard/components/search/index.vue';
-import Setting from '@/mainCard/components/setting/index.vue';
-
-import homeTitle from '@/headerCard/components/title/homeTitle.vue';
-import searchTitle from '@/headerCard/components/title/searchTitle.vue';
-import aboutTitle from '@/headerCard/components/title/aboutTitle.vue';
-import settingTitle from '@/headerCard/components/title/settingTitle.vue';
+import Home from '@/pages/home/index.vue';
+import HomeTitle from '@/pages/home/title.vue';
 
 export const router = createRouter({
     history: createWebHashHistory(),
@@ -22,31 +15,39 @@ export const router = createRouter({
             path: '/home',
             components: {
                 main: Home,
-                title: homeTitle
+                title: HomeTitle
             }
         },
         {
             name: 'about',
             path: '/about',
             components: {
-                main: About,
-                title: aboutTitle
+                main: () => import('@/pages/about/index.vue'),
+                title: () => import('@/pages/about/title.vue')
             }
         },
         {
             name: 'search',
             path: '/search',
             components: {
-                main: Search,
-                title: searchTitle
+                main: () => import('@/pages/search/index.vue'),
+                title: () => import('@/pages/search/title.vue')
             }
         },
         {
             name: 'setting',
             path: '/setting',
             components: {
-                main: Setting,
-                title: settingTitle
+                main: () => import('@/pages/setting/index.vue'),
+                title: () => import('@/pages/setting/title.vue')
+            }
+        },
+        {
+            name: 'lolaram',
+            path: '/lolaram',
+            components: {
+                main: () => import('@/pages/lolaram/index.vue'),
+                title: () => import('@/pages/lolaram/title.vue')
             }
         }
     ]

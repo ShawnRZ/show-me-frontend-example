@@ -13,6 +13,7 @@ import Avatar from './components/Avatar.vue';
         <router-link to="/">主页</router-link>
         <router-link to="/setting">设置</router-link>
         <router-link to="/about">关于</router-link>
+        <router-link to="/lolaram">LoL ARAM</router-link>
 
         <div class="space"></div>
 

@@ -1,7 +1,7 @@
 <script setup>
 
-import sysButton from './components/sysButton.vue';
-import searchBar from './components/searchBar.vue';
+import sysButton from './components/SysButton.vue';
+import searchBar from './components/SearchBar.vue';
 
 
 </script>
