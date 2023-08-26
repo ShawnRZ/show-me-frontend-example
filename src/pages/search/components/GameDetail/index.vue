@@ -73,14 +73,12 @@ const blueTeamKills = computed(() => {
     return k;
 });
 
-const search = (name) => {
-    if (name.value === '') {
-        return;
-    }
+const search = (id) => {
+    console.debug('id', id);
     Router.push({
         path: '/search',
         query: {
-            name: name
+            id: id
         }
     });
 }
@@ -168,11 +166,11 @@ const search = (name) => {
                     </div>
                     <div class="summoner">
                         <div class="name "
-                            @click="search(game.participantIdentities[p.participantId - 1].player.summonerName)">
+                            @click="search(game.participantIdentities[p.participantId - 1].player.summonerId)">
                             {{ game.participantIdentities[p.participantId - 1].player.summonerName }}
                         </div>
                         <div class="tier">
-                            <RankTier :name="game.participantIdentities[p.participantId - 1].player.summonerName">
+                            <RankTier :id="game.participantIdentities[p.participantId - 1].player.summonerId">
                             </RankTier>
                         </div>
                     </div>
@@ -269,11 +267,11 @@ const search = (name) => {
                     </div>
                     <div class="summoner">
                         <div class="name"
-                            @click="search(game.participantIdentities[p.participantId - 1].player.summonerName)">
+                            @click="search(game.participantIdentities[p.participantId - 1].player.summonerId)">
                             {{ game.participantIdentities[p.participantId - 1].player.summonerName }}
                         </div>
                         <div class="tier">
-                            <RankTier :name="game.participantIdentities[p.participantId - 1].player.summonerName">
+                            <RankTier :id="game.participantIdentities[p.participantId - 1].player.summonerId">
                             </RankTier>
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 <script setup>
 
 import { useRoute } from 'vue-router';
-import { getSummonerByName, getRankedStats, getMatchHistoryByPuuid, launchSpectate } from '@/lcu';
+import { getSummonerByName, getRankedStats, getMatchHistoryByPuuid, launchSpectate, getSummonerById } from '@/lcu';
 import { ref, watch } from 'vue';
 import { ElNotification } from 'element-plus';
 import { useMetadataStore } from '@/stores/metadata';
@@ -67,7 +67,15 @@ watch(currentPage, async (page, oldPage) => {
 
 const loadData = async () => {
     try {
-        const s = await getSummonerByName(Route.query.name);
+        let s = null;
+        if (Route.query.id) {
+            s = await getSummonerById(Route.query.id);
+        } else if (Route.query.name) {
+            s = await getSummonerByName(Route.query.name);
+        } else {
+            return;
+        }
+        console.debug(Route.query);
         console.debug(s);
         summoner.value = s;
     } catch (error) {
@@ -110,26 +118,25 @@ const loadData = async () => {
     }
 }
 
-watch(() => Route.query.name, async () => {
-    console.log(Route.query.name);
-    // 收起对局详情
-    isGameDetailShow.value = false;
-    // 重置页面数据
-    summoner.value = null;
-    rankedStats.value = null;
-    matchHistory.value = null;
-    currentPage.value = 1;
-    gameId.value = 0;
+watch(
+    () => [Route.query.name, Route.query.id],
+    async () => {
+        console.debug(Route.query);
+        // 收起对局详情
+        isGameDetailShow.value = false;
+        // 重置页面数据
+        summoner.value = null;
+        rankedStats.value = null;
+        matchHistory.value = null;
+        currentPage.value = 1;
+        gameId.value = 0;
+        await loadData();
 
-
-    if (!Route.query.name) {
-        return;
-    }
-    await loadData();
-
-}, {
-    immediate: true
-});
+    },
+    {
+        immediate: true,
+        deep: true,
+    });
 
 const copyMyName = () => {
     navigator.clipboard.writeText(summoner.value.displayName).then(() => {

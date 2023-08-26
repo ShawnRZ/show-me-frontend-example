@@ -21,7 +21,6 @@ export async function refreshParameter() {
 }
 
 export async function connect() {
-    // try {
     await invoke("connect");
     const gf = await listen("Gameflow", async (e) => {
         console.log(e);
@@ -48,9 +47,6 @@ export async function connect() {
         cc();
         console.log("断开连接");
     })
-    // } catch (err) {
-    //     console.log(err);
-    // }
 }
 
 export async function getChampSelectSession() {
@@ -68,12 +64,6 @@ export async function getCurrentSummoner() {
 }
 
 export async function getSummonerByName(name) {
-    // try {
-    //     let res = await invoke("get_summoner_by_name", { name: name });
-    //     console.log(res);
-    // } catch (err) {
-    //     console.log(err);
-    // }
     let res = await invoke("get_summoner_by_name", { name: name });
     return res;
 }
@@ -99,4 +89,8 @@ export async function launchSpectate(puuid) {
 
 export async function testAndSetCer() {
     return await invoke("test_and_set_cer");
+}
+
+export async function getSummonerById(id) {
+    return await invoke("get_summoner_by_id", { id: id })
 }
