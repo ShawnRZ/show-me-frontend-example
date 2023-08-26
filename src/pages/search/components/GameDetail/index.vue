@@ -327,6 +327,7 @@ const search = (name) => {
             .spells {
                 display: flex;
                 flex-direction: column;
+                margin-left: 1px;
             }
 
             .items-runes {
@@ -334,13 +335,17 @@ const search = (name) => {
                     display: flex;
 
                     .el-avatar {
-
                         background-color: transparent;
+                        margin-left: 1px;
                     }
                 }
 
                 .items {
                     display: flex;
+
+                    .el-avatar {
+                        margin-left: 1px;
+                    }
                 }
             }
 
