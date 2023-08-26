@@ -8,6 +8,7 @@ const props = defineProps(['name']);
 
 const tier = ref('');
 watch(() => props.name, async () => {
+    tier.value = '';
     const s = await getSummonerByName(props.name);
     const r = await getRankedStats(s.puuid);
     tier.value = switchRankedTier(r.queueMap['RANKED_SOLO_5x5'].tier);

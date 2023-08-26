@@ -6,12 +6,12 @@ import { useRouter } from 'vue-router';
 import { useMetadataStore } from '@/stores/metadata';
 import { getMatchById } from '@/lcu'
 
-import rankTier from './components/rankTier.vue';
+import RankTier from './components/RankTier.vue';
 
 const props = defineProps({ 'gameId': Number, 'name': String });
 
 const game = ref(null);
-const metadataStore = useMetadataStore();
+const metadata = useMetadataStore();
 const Router = useRouter();
 
 watch(() => props.gameId, async () => {
@@ -96,90 +96,74 @@ const search = (name) => {
             <div :class="['redSide', winTeam === 100 ? 'win' : 'lose']">
                 <div :class="['participant', game.participantIdentities[p.participantId - 1].player.summonerName === props.name ? 'target' : '']"
                     v-for="p in redTeam" v-if="redTeam">
-                    <el-avatar :size="40"
-                        :src="`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${p.championId}.png`" />
+                    <el-avatar :size="40" :src="metadata.getChampionIconPath(p.championId)" />
                     <div class="spells">
-                        <el-avatar :size="20" shape="square"
-                            :src="`https://show-me-static.zexuan.ren/spell/${p.spell1Id}.png`"></el-avatar>
-                        <el-avatar :size="20" shape="square"
-                            :src="`https://show-me-static.zexuan.ren/spell/${p.spell2Id}.png`"></el-avatar>
+                        <el-avatar :size="20" shape="square" :src="metadata.getSpell(p.spell1Id)"></el-avatar>
+                        <el-avatar :size="20" shape="square" :src="metadata.getSpell(p.spell2Id)"></el-avatar>
                     </div>
                     <div class="items-runes">
                         <div class="runes">
                             <el-tooltip>
                                 <template #content>
-                                    <div v-html="metadataStore.getPerkEndOfGameStatDescs(p.stats.perk0,
+                                    <div v-html="metadata.getRuneEndOfGameStatDescs(p.stats.perk0,
                                         p.stats.perk0Var1, p.stats.perk0Var2,
                                         p.stats.perk0Var3)"></div>
                                 </template>
-                                <el-avatar :size="20" shape="square"
-                                    :src="metadataStore.getPerkIconPath(p.stats.perk0)"></el-avatar>
+                                <el-avatar :size="20" shape="square" :src="metadata.getRune(p.stats.perk0)"></el-avatar>
                             </el-tooltip>
                             <el-tooltip>
                                 <template #content>
-                                    <div v-html="metadataStore.getPerkEndOfGameStatDescs(p.stats.perk1,
+                                    <div v-html="metadata.getRuneEndOfGameStatDescs(p.stats.perk1,
                                         p.stats.perk1Var1, p.stats.perk1Var2,
                                         p.stats.perk1Var3)"></div>
                                 </template>
-                                <el-avatar :size="20" shape="square"
-                                    :src="metadataStore.getPerkIconPath(p.stats.perk1)"></el-avatar>
+                                <el-avatar :size="20" shape="square" :src="metadata.getRune(p.stats.perk1)"></el-avatar>
                             </el-tooltip>
 
                             <el-tooltip>
                                 <template #content>
-                                    <div v-html="metadataStore.getPerkEndOfGameStatDescs(p.stats.perk2,
+                                    <div v-html="metadata.getRuneEndOfGameStatDescs(p.stats.perk2,
                                         p.stats.perk2Var1, p.stats.perk2Var2,
                                         p.stats.perk2Var3)"></div>
                                 </template>
-                                <el-avatar :size="20" shape="square"
-                                    :src="metadataStore.getPerkIconPath(p.stats.perk2)"></el-avatar>
+                                <el-avatar :size="20" shape="square" :src="metadata.getRune(p.stats.perk2)"></el-avatar>
                             </el-tooltip>
 
                             <el-tooltip>
                                 <template #content>
-                                    <div v-html="metadataStore.getPerkEndOfGameStatDescs(p.stats.perk3,
+                                    <div v-html="metadata.getRuneEndOfGameStatDescs(p.stats.perk3,
                                         p.stats.perk3Var1, p.stats.perk3Var2,
                                         p.stats.perk3Var3)"></div>
                                 </template>
-                                <el-avatar :size="20" shape="square"
-                                    :src="metadataStore.getPerkIconPath(p.stats.perk3)"></el-avatar>
+                                <el-avatar :size="20" shape="square" :src="metadata.getRune(p.stats.perk3)"></el-avatar>
                             </el-tooltip>
 
                             <el-tooltip>
                                 <template #content>
-                                    <div v-html="metadataStore.getPerkEndOfGameStatDescs(p.stats.perk4,
+                                    <div v-html="metadata.getRuneEndOfGameStatDescs(p.stats.perk4,
                                         p.stats.perk4Var1, p.stats.perk4Var2,
                                         p.stats.perk4Var3)"></div>
                                 </template>
-                                <el-avatar :size="20" shape="square"
-                                    :src="metadataStore.getPerkIconPath(p.stats.perk4)"></el-avatar>
+                                <el-avatar :size="20" shape="square" :src="metadata.getRune(p.stats.perk4)"></el-avatar>
                             </el-tooltip>
 
                             <el-tooltip>
                                 <template #content>
-                                    <div v-html="metadataStore.getPerkEndOfGameStatDescs(p.stats.perk5,
+                                    <div v-html="metadata.getRuneEndOfGameStatDescs(p.stats.perk5,
                                         p.stats.perk5Var1, p.stats.perk5Var2,
                                         p.stats.perk5Var3)"></div>
                                 </template>
-                                <el-avatar :size="20" shape="square"
-                                    :src="metadataStore.getPerkIconPath(p.stats.perk5)"></el-avatar>
+                                <el-avatar :size="20" shape="square" :src="metadata.getRune(p.stats.perk5)"></el-avatar>
                             </el-tooltip>
                         </div>
                         <div class="items">
-                            <el-avatar :size="20" shape="square"
-                                :src="metadataStore.getItemIconPath(p.stats.item0)"></el-avatar>
-                            <el-avatar :size="20" shape="square"
-                                :src="metadataStore.getItemIconPath(p.stats.item1)"></el-avatar>
-                            <el-avatar :size="20" shape="square"
-                                :src="metadataStore.getItemIconPath(p.stats.item2)"></el-avatar>
-                            <el-avatar :size="20" shape="square"
-                                :src="metadataStore.getItemIconPath(p.stats.item3)"></el-avatar>
-                            <el-avatar :size="20" shape="square"
-                                :src="metadataStore.getItemIconPath(p.stats.item4)"></el-avatar>
-                            <el-avatar :size="20" shape="square"
-                                :src="metadataStore.getItemIconPath(p.stats.item5)"></el-avatar>
-                            <el-avatar :size="20" shape="square"
-                                :src="metadataStore.getItemIconPath(p.stats.item6)"></el-avatar>
+                            <el-avatar :size="20" shape="square" :src="metadata.getItem(p.stats.item0)"></el-avatar>
+                            <el-avatar :size="20" shape="square" :src="metadata.getItem(p.stats.item1)"></el-avatar>
+                            <el-avatar :size="20" shape="square" :src="metadata.getItem(p.stats.item2)"></el-avatar>
+                            <el-avatar :size="20" shape="square" :src="metadata.getItem(p.stats.item3)"></el-avatar>
+                            <el-avatar :size="20" shape="square" :src="metadata.getItem(p.stats.item4)"></el-avatar>
+                            <el-avatar :size="20" shape="square" :src="metadata.getItem(p.stats.item5)"></el-avatar>
+                            <el-avatar :size="20" shape="square" :src="metadata.getItem(p.stats.item6)"></el-avatar>
                         </div>
                     </div>
                     <div class="summoner">
@@ -188,8 +172,8 @@ const search = (name) => {
                             {{ game.participantIdentities[p.participantId - 1].player.summonerName }}
                         </div>
                         <div class="tier">
-                            <rankTier :name="game.participantIdentities[p.participantId - 1].player.summonerName">
-                            </rankTier>
+                            <RankTier :name="game.participantIdentities[p.participantId - 1].player.summonerName">
+                            </RankTier>
                         </div>
                     </div>
                     <div class="k-d-a">
@@ -212,91 +196,75 @@ const search = (name) => {
             <div :class="['blueSide', winTeam === 200 ? 'win' : 'lose']">
                 <div :class="['participant', game.participantIdentities[p.participantId - 1].player.summonerName === props.name ? 'target' : '']"
                     v-for="p in blueTeam" v-if="blueTeam">
-                    <el-avatar :size="40"
-                        :src="`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${p.championId}.png`" />
+                    <el-avatar :size="40" :src="metadata.getChampionIconPath(p.championId)" />
                     <div class="spells">
-                        <el-avatar :size="20" shape="square"
-                            :src="`https://show-me-static.zexuan.ren/spell/${p.spell1Id}.png`"></el-avatar>
-                        <el-avatar :size="20" shape="square"
-                            :src="`https://show-me-static.zexuan.ren/spell/${p.spell2Id}.png`"></el-avatar>
+                        <el-avatar :size="20" shape="square" :src="metadata.getSpell(p.spell1Id)"></el-avatar>
+                        <el-avatar :size="20" shape="square" :src="metadata.getSpell(p.spell2Id)"></el-avatar>
                     </div>
                     <div class="items-runes">
                         <div class="runes">
                             <el-tooltip>
                                 <template #content>
-                                    <div v-html="metadataStore.getPerkEndOfGameStatDescs(p.stats.perk0,
+                                    <div v-html="metadata.getRuneEndOfGameStatDescs(p.stats.perk0,
                                         p.stats.perk0Var1, p.stats.perk0Var2,
                                         p.stats.perk0Var3)"></div>
                                 </template>
-                                <el-avatar :size="20" shape="square"
-                                    :src="metadataStore.getPerkIconPath(p.stats.perk0)"></el-avatar>
+                                <el-avatar :size="20" shape="square" :src="metadata.getRune(p.stats.perk0)"></el-avatar>
                             </el-tooltip>
                             <el-tooltip>
                                 <template #content>
-                                    <div v-html="metadataStore.getPerkEndOfGameStatDescs(p.stats.perk1,
+                                    <div v-html="metadata.getRuneEndOfGameStatDescs(p.stats.perk1,
                                         p.stats.perk1Var1, p.stats.perk1Var2,
                                         p.stats.perk1Var3)"></div>
                                 </template>
-                                <el-avatar :size="20" shape="square"
-                                    :src="metadataStore.getPerkIconPath(p.stats.perk1)"></el-avatar>
+                                <el-avatar :size="20" shape="square" :src="metadata.getRune(p.stats.perk1)"></el-avatar>
                             </el-tooltip>
 
                             <el-tooltip>
                                 <template #content>
-                                    <div v-html="metadataStore.getPerkEndOfGameStatDescs(p.stats.perk2,
+                                    <div v-html="metadata.getRuneEndOfGameStatDescs(p.stats.perk2,
                                         p.stats.perk2Var1, p.stats.perk2Var2,
                                         p.stats.perk2Var3)"></div>
                                 </template>
-                                <el-avatar :size="20" shape="square"
-                                    :src="metadataStore.getPerkIconPath(p.stats.perk2)"></el-avatar>
+                                <el-avatar :size="20" shape="square" :src="metadata.getRune(p.stats.perk2)"></el-avatar>
                             </el-tooltip>
 
                             <el-tooltip>
                                 <template #content>
-                                    <div v-html="metadataStore.getPerkEndOfGameStatDescs(p.stats.perk3,
+                                    <div v-html="metadata.getRuneEndOfGameStatDescs(p.stats.perk3,
                                         p.stats.perk3Var1, p.stats.perk3Var2,
                                         p.stats.perk3Var3)"></div>
                                 </template>
-                                <el-avatar :size="20" shape="square"
-                                    :src="metadataStore.getPerkIconPath(p.stats.perk3)"></el-avatar>
+                                <el-avatar :size="20" shape="square" :src="metadata.getRune(p.stats.perk3)"></el-avatar>
                             </el-tooltip>
 
                             <el-tooltip>
                                 <template #content>
-                                    <div v-html="metadataStore.getPerkEndOfGameStatDescs(p.stats.perk4,
+                                    <div v-html="metadata.getRuneEndOfGameStatDescs(p.stats.perk4,
                                         p.stats.perk4Var1, p.stats.perk4Var2,
                                         p.stats.perk4Var3)"></div>
                                 </template>
-                                <el-avatar :size="20" shape="square"
-                                    :src="metadataStore.getPerkIconPath(p.stats.perk4)"></el-avatar>
+                                <el-avatar :size="20" shape="square" :src="metadata.getRune(p.stats.perk4)"></el-avatar>
                             </el-tooltip>
 
                             <el-tooltip>
                                 <template #content>
-                                    <div v-html="metadataStore.getPerkEndOfGameStatDescs(p.stats.perk5,
+                                    <div v-html="metadata.getRuneEndOfGameStatDescs(p.stats.perk5,
                                         p.stats.perk5Var1, p.stats.perk5Var2,
                                         p.stats.perk5Var3)"></div>
                                 </template>
-                                <el-avatar :size="20" shape="square"
-                                    :src="metadataStore.getPerkIconPath(p.stats.perk5)"></el-avatar>
+                                <el-avatar :size="20" shape="square" :src="metadata.getRune(p.stats.perk5)"></el-avatar>
                             </el-tooltip>
 
                         </div>
                         <div class="items">
-                            <el-avatar :size="20" shape="square"
-                                :src="metadataStore.getItemIconPath(p.stats.item0)"></el-avatar>
-                            <el-avatar :size="20" shape="square"
-                                :src="metadataStore.getItemIconPath(p.stats.item1)"></el-avatar>
-                            <el-avatar :size="20" shape="square"
-                                :src="metadataStore.getItemIconPath(p.stats.item2)"></el-avatar>
-                            <el-avatar :size="20" shape="square"
-                                :src="metadataStore.getItemIconPath(p.stats.item3)"></el-avatar>
-                            <el-avatar :size="20" shape="square"
-                                :src="metadataStore.getItemIconPath(p.stats.item4)"></el-avatar>
-                            <el-avatar :size="20" shape="square"
-                                :src="metadataStore.getItemIconPath(p.stats.item5)"></el-avatar>
-                            <el-avatar :size="20" shape="square"
-                                :src="metadataStore.getItemIconPath(p.stats.item6)"></el-avatar>
+                            <el-avatar :size="20" shape="square" :src="metadata.getItem(p.stats.item0)"></el-avatar>
+                            <el-avatar :size="20" shape="square" :src="metadata.getItem(p.stats.item1)"></el-avatar>
+                            <el-avatar :size="20" shape="square" :src="metadata.getItem(p.stats.item2)"></el-avatar>
+                            <el-avatar :size="20" shape="square" :src="metadata.getItem(p.stats.item3)"></el-avatar>
+                            <el-avatar :size="20" shape="square" :src="metadata.getItem(p.stats.item4)"></el-avatar>
+                            <el-avatar :size="20" shape="square" :src="metadata.getItem(p.stats.item5)"></el-avatar>
+                            <el-avatar :size="20" shape="square" :src="metadata.getItem(p.stats.item6)"></el-avatar>
                         </div>
                     </div>
                     <div class="summoner">
@@ -305,8 +273,8 @@ const search = (name) => {
                             {{ game.participantIdentities[p.participantId - 1].player.summonerName }}
                         </div>
                         <div class="tier">
-                            <rankTier :name="game.participantIdentities[p.participantId - 1].player.summonerName">
-                            </rankTier>
+                            <RankTier :name="game.participantIdentities[p.participantId - 1].player.summonerName">
+                            </RankTier>
                         </div>
                     </div>
                     <div class="k-d-a">
@@ -364,6 +332,11 @@ const search = (name) => {
             .items-runes {
                 .runes {
                     display: flex;
+
+                    .el-avatar {
+
+                        background-color: transparent;
+                    }
                 }
 
                 .items {

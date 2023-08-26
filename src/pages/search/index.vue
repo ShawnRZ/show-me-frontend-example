@@ -10,13 +10,14 @@ import { switchRankedTier } from '@/tool';
 import GameDetail from './components/GameDetail/index.vue';
 
 const Route = useRoute();
+const metadata = useMetadataStore();
 
 const summoner = ref(null);
 const rankedStats = ref(null);
 const matchHistory = ref(null);
 const currentPage = ref(1);
 const gameId = ref(0);
-const metadataStore = useMetadataStore();
+
 const isGameDetailShow = ref(false);
 
 const showGameDetail = (id) => {
@@ -46,6 +47,9 @@ const showGameDetail = (id) => {
 // 替换翻页数据
 watch(currentPage, async (page, oldPage) => {
     console.debug(currentPage.value);
+    if (!summoner.value) {
+        return;
+    }
     try {
         const m = await getMatchHistoryByPuuid(summoner.value.puuid, (currentPage.value - 1) * 6, (currentPage.value - 1) * 6 + 5);
         console.debug(m);
@@ -61,16 +65,7 @@ watch(currentPage, async (page, oldPage) => {
     }
 });
 
-watch(() => Route.query.name, async () => {
-    console.log(Route.query.name);
-    // 收起对局详情
-    isGameDetailShow.value = false;
-    gameId.value = 0;
-
-    if (!Route.query.name) {
-        return;
-    }
-
+const loadData = async () => {
     try {
         const s = await getSummonerByName(Route.query.name);
         console.debug(s);
@@ -113,6 +108,25 @@ watch(() => Route.query.name, async () => {
     } else {
         currentPage.value = 1;
     }
+}
+
+watch(() => Route.query.name, async () => {
+    console.log(Route.query.name);
+    // 收起对局详情
+    isGameDetailShow.value = false;
+    // 重置页面数据
+    summoner.value = null;
+    rankedStats.value = null;
+    matchHistory.value = null;
+    currentPage.value = 1;
+    gameId.value = 0;
+
+
+    if (!Route.query.name) {
+        return;
+    }
+    await loadData();
+
 }, {
     immediate: true
 });
@@ -179,7 +193,7 @@ const spectate = async (puuid) => {
         });
     } catch (error) {
         ElNotification.info({
-            title: '观战拉起s失败',
+            title: '观战拉起失败',
             message: '请确认当前玩家正在游戏中:' + error,
             position: 'bottom-right',
         });
@@ -193,9 +207,7 @@ const spectate = async (puuid) => {
         <div class="summoner-info">
             <el-card class="profile" body-style="display:flex;" shadow="hover" v-if="summoner">
                 <div class="avatar">
-                    <el-avatar shape="square" :size="100"
-                        :src="`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${summoner.profileIconId}.jpg`">
-                    </el-avatar>
+                    <el-avatar shape="square" :size="100" :src="metadata.getProfileIconPath(summoner.profileIconId)" />
                     <div class="level"><span>{{ summoner.summonerLevel }}</span></div>
                 </div>
                 <div v-show="!isGameDetailShow">
@@ -204,13 +216,18 @@ const spectate = async (puuid) => {
                         <br>
                         <el-icon class="copy" @click="copyMyName()" size="large">
                             <CopyDocument />
-                        </el-icon>&nbsp;
+                        </el-icon>
+                        <span>&nbsp;</span>
                         <el-tooltip>
                             <template #content>观战</template>
                             <el-icon class="spectate" @click="spectate(summoner.puuid)" size="large">
                                 <VideoCamera />
                             </el-icon>
                         </el-tooltip>
+                        <span>&nbsp;</span>
+                        <el-icon class="refresh" size="large" @click="loadData()">
+                            <Refresh />
+                        </el-icon>
                     </h1>
                     <span class="privacy">{{ summoner.privacy === "PRIVATE" ? '隐藏生涯' : '公开生涯' }}</span>
                 </div>
@@ -270,25 +287,22 @@ const spectate = async (puuid) => {
                 </div>
                 <div class="detail">
                     <div class="champion">
-                        <img class="champion-icon"
-                            :src="`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${game.participants[0].championId}.png`"
-                            alt="">
+                        <el-avatar class="champion-icon"
+                            :src="metadata.getChampionIconPath(game.participants[0].championId)" />
                         <div class="spells">
-                            <img :src="`https://show-me-static.zexuan.ren/spell/${game.participants[0].spell1Id}.png`"
-                                alt="">
-                            <img :src="`https://show-me-static.zexuan.ren/spell/${game.participants[0].spell2Id}.png`"
-                                alt="">
+                            <el-avatar shape="square" :size="20" :src="metadata.getSpell(game.participants[0].spell1Id)" />
+                            <el-avatar shape="square" :size="20" :src="metadata.getSpell(game.participants[0].spell2Id)" />
                         </div>
                         <div class="runes">
                             <el-tooltip>
                                 <template #content>
-                                    <div v-html="metadataStore.getPerkEndOfGameStatDescs(game.participants[0].stats.perk0,
+                                    <div v-html="metadata.getRuneEndOfGameStatDescs(game.participants[0].stats.perk0,
                                         game.participants[0].stats.perk0Var1, game.participants[0].stats.perk0Var2,
                                         game.participants[0].stats.perk0Var3)"></div>
                                 </template>
-                                <img :src="metadataStore.getPerkIconPath(game.participants[0].stats.perk0)" alt="">
+                                <el-avatar :size="20" :src="metadata.getRune(game.participants[0].stats.perk0)" />
                             </el-tooltip>
-                            <img :src="metadataStore.getPerkStylesIconPath(game.participants[0].stats.perkSubStyle)" alt="">
+                            <el-avatar :size="20" :src="metadata.getRune(game.participants[0].stats.perkSubStyle)" />
                         </div>
                         <div class="kda">
                             <div class="k-d-a">
@@ -307,13 +321,13 @@ const spectate = async (puuid) => {
                         </div>
                     </div>
                     <div class="items">
-                        <img :src="metadataStore.getItemIconPath(game.participants[0].stats.item0)" alt="">
-                        <img :src="metadataStore.getItemIconPath(game.participants[0].stats.item1)" alt="">
-                        <img :src="metadataStore.getItemIconPath(game.participants[0].stats.item2)" alt="">
-                        <img :src="metadataStore.getItemIconPath(game.participants[0].stats.item3)" alt="">
-                        <img :src="metadataStore.getItemIconPath(game.participants[0].stats.item4)" alt="">
-                        <img :src="metadataStore.getItemIconPath(game.participants[0].stats.item5)" alt="">
-                        <img :src="metadataStore.getItemIconPath(game.participants[0].stats.item6)" alt="">
+                        <img :src="metadata.getItem(game.participants[0].stats.item0)" alt="">
+                        <img :src="metadata.getItem(game.participants[0].stats.item1)" alt="">
+                        <img :src="metadata.getItem(game.participants[0].stats.item2)" alt="">
+                        <img :src="metadata.getItem(game.participants[0].stats.item3)" alt="">
+                        <img :src="metadata.getItem(game.participants[0].stats.item4)" alt="">
+                        <img :src="metadata.getItem(game.participants[0].stats.item5)" alt="">
+                        <img :src="metadata.getItem(game.participants[0].stats.item6)" alt="">
                     </div>
                 </div>
                 <div class="stats">
@@ -393,7 +407,8 @@ const spectate = async (puuid) => {
             }
 
             .copy,
-            .spectate {
+            .spectate,
+            .refresh {
                 cursor: pointer;
             }
         }
@@ -501,12 +516,6 @@ const spectate = async (puuid) => {
                     display: flex;
                     flex-direction: column;
                     margin-left: 2px;
-
-                    img {
-                        width: 20px;
-                        height: 20px;
-                        border-radius: 4px;
-                    }
                 }
 
                 .kda {
@@ -545,13 +554,10 @@ const spectate = async (puuid) => {
                 .runes {
                     display: flex;
                     flex-direction: column;
-                    height: 20px;
                     margin-left: 1px;
 
-                    img {
-                        width: 20px;
-                        height: 20px;
-                        border-radius: 4px;
+                    .el-avatar {
+                        background-color: transparent;
                     }
                 }
             }

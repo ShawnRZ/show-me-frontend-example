@@ -7,8 +7,8 @@ import { useConfigStore } from './config';
 export const useMetadataStore = defineStore('metadata', {
     state: () => ({
         cd: {
-            perks: new Map,
-            perkstyles: new Map,
+            runes: new Map,
+            runestyles: new Map,
             items: new Map,
             spells: new Map,
             queues: new Map,
@@ -21,90 +21,69 @@ export const useMetadataStore = defineStore('metadata', {
         },
     }),
     getters: {
-        getPerks() {
-            return this.perks;
-        },
-        getPerkStyles() {
-            return this.perkstyles;
-        },
-        getItems() {
-            return this.items;
-        },
-        getSpells() {
-            return this.spells;
-        },
-        getQueues() {
-            return this.queues;
-        },
-
-        getItemIconPath() {
-            const configStore = useConfigStore();
-            switch (configStore.metadata) {
+        getRune() {
+            const config = useConfigStore();
+            switch (config.metadata) {
                 case 0:
                     return (id) => {
+                        return '';
+                    };
+                case 1:
+                    return (id) => {
+                        if (id === 0) {
+                            return '';
+                        }
+                        console.debug(id, this.tc.runes);
+                        return this.tc.runes.get(`${id}`).icon;
+                    };
+                default:
+                    return '';
+            }
+        },
+        getItem() {
+            const config = useConfigStore();
+            switch (config.metadata) {
+                case 0:
+
+                    return;
+                case 1:
+                    return (id) => {
+                        console.debug(id, this.tc.items);
                         if (id === 0) {
                             id = 7050;
                         }
-                        const baseUrl = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/items/icons2d/';
-                        console.info(id, this.getItems.get(id));
-                        const iconPath = this.getItems.get(id).iconPath;
-                        const path = iconPath.replace('/lol-game-data/assets/ASSETS/Items/Icons2D/', baseUrl).toLowerCase();
-                        return path;
+                        return `https://game.gtimg.cn/images/lol/act/img/item/${id}.png`
                     };
-
-                case 1:
-                    return (id) => {
-                        if (id === 0) {
-                            return 'https://game.gtimg.cn/images/lol/act/img/item/7050.png'
-                        }
-                        return this.tc.items[id].iconPath;
-                    };
-
                 default:
-                    break;
-            };
+                    return;
+            }
         },
-
-        getRuneIconPath() {
-            const configStore = useConfigStore();
-            switch (configStore.metadata) {
+        getSpell() {
+            const config = useConfigStore();
+            switch (config.metadata) {
                 case 0:
-                    return (id) => {
-                        if (id === 0) {
-                            return 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perk-images/styles/runesicon.png';
-                        }
-                        const baseUrl = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perk-images/styles/';
-                        let iconPath = '';
-                        if (id in this.cd.perks) {
-                            iconPath = this.cd.perks[id].iconPath;
-                        } else {
-                            iconPath = this.cd.perkstyles[id].iconPath;
-                        }
-                        const path = iconPath.replace('/lol-game-data/assets/v1/perk-images/Styles/', baseUrl).toLowerCase();
-                        return path;
-                    };
-
+                    return;
                 case 1:
                     return (id) => {
-                        if (id === 0) {
-                            return 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/perk-images/styles/runesicon.png';
-                        }
-                        const path = this.tc.runes[id].iconPath;
-                        return path;
+                        return this.tc.spells.get(`${id}`).icon;
                     };
 
                 default:
-                    break;
+                    return;
+            }
+        },
+        getQueueName() {
+            return (id) => {
+                return this.cd.queues.get(`${id}`).name;
             };
         },
-
-        getPerkEndOfGameStatDescs() {
+        getRuneEndOfGameStatDescs() {
             return (id, var1, var2, var3) => {
+                console.debug('getRuneEndOfGameStatDescs', id, this.cd.runes);
                 if (id === 0) {
                     return '未知符文';
                 }
-                console.info(id, this.getPerks.get(id).value);
-                const endOfGameStatDescs = this.getPerks.get(id).endOfGameStatDescs;
+                const endOfGameStatDescs = this.cd.runes.get(id).endOfGameStatDescs;
                 let baseText = '';
                 for (let i = 0; i < endOfGameStatDescs.length; i++) {
                     if (i !== 0) {
@@ -117,7 +96,6 @@ export const useMetadataStore = defineStore('metadata', {
                 return text;
             }
         },
-
         getProfileIconPath() {
             const configStore = useConfigStore();
             switch (configStore.metadata) {
@@ -138,6 +116,24 @@ export const useMetadataStore = defineStore('metadata', {
                     break;
             }
         },
+        getChampionIconPath() {
+            const config = useConfigStore();
+            switch (config.metadata) {
+                case 0:
+                    return (id) => {
+                        const baseUrl = `https://cdn.communitydragon.org/latest/profile-icon/${id}`;
+                        return baseUrl;
+                    };
+                case 1:
+                    return (id) => {
+                        const name = this.tc.heros.get(`${id}`).alias;
+                        const baseUrl = `https://game.gtimg.cn/images/lol/act/img/champion/${name}.png`;
+                        return baseUrl;
+                    }
+                default:
+                    break;
+            }
+        }
     },
     actions: {
         async init() {
@@ -145,8 +141,8 @@ export const useMetadataStore = defineStore('metadata', {
             switch (configStore.metadata) {
                 case 0:
                     // 初始化 cd 元数据
-                    await this.initPerks_cd();
-                    await this.initPerkstyle_cd();
+                    await this.initRunes_cd();
+                    await this.initRunestyle_cd();
                     await this.initItems_cd();
                     await this.initSpells_cd();
                     await this.initQueues_cd();
@@ -158,6 +154,7 @@ export const useMetadataStore = defineStore('metadata', {
                     await this.initRunes_tc();
                     await this.initSpells_tc();
                     await this.initQueues_cd();
+                    await this.initRunes_cd();
                     break;
 
                 default:
@@ -165,32 +162,32 @@ export const useMetadataStore = defineStore('metadata', {
             }
             return true;
         },
-        async initPerks_cd() {
+        async initRunes_cd() {
             const perksUrl = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/zh_cn/v1/perks.json';
             try {
                 const perksList = await fetch(perksUrl).then(res => res.data);
-                this.cd.perks.clear();
+                this.cd.runes.clear();
                 for (let i = 0; i < perksList.length; i++) {
                     const e = perksList[i];
-                    this.cd.perks.set(e.id, e);
+                    this.cd.runes.set(e.id, e);
                 }
-                console.debug('perks_cd', this.cd.perks);
+                console.debug('runes_cd', this.cd.runes);
             } catch (error) {
-                throw new Error('perks_cd 初始化失败: ' + error);
+                throw new Error('runes_cd 初始化失败: ' + error);
             }
         },
-        async initPerkstyle_cd() {
+        async initRunestyle_cd() {
             const perkstylesUrl = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/zh_cn/v1/perkstyles.json';
             try {
                 const perkstylesList = await fetch(perkstylesUrl).then(res => res.data.styles);
-                this.cd.perkstyles.clear();
+                this.cd.runestyles.clear();
                 for (let i = 0; i < perkstylesList.length; i++) {
                     const e = perkstylesList[i];
-                    this.cd.perkstyles.set(e.id, e);
+                    this.cd.runestyles.set(e.id, e);
                 }
-                console.debug('perkstyle_cd', this.cd.perkstyles);
+                console.debug('runestyles_cd', this.cd.runestyles);
             } catch (error) {
-                throw new Error('perkstyle_cd 初始化失败: ' + error);
+                throw new Error('runestyles_cd 初始化失败: ' + error);
             }
         },
         async initItems_cd() {
