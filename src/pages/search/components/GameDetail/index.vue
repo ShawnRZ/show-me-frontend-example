@@ -15,10 +15,10 @@ const metadata = useMetadataStore();
 const Router = useRouter();
 
 watch(() => props.gameId, async () => {
-    console.debug('当前对局id: ', props.gameId);
+    console.log('当前对局id: ', props.gameId);
     try {
         game.value = await getMatchById(props.gameId);
-        console.debug('当前对局信息：', game.value);
+        console.log('当前对局信息：', game.value);
     } catch (error) {
         ElNotification.info({
             title: '获取对局信息失败',

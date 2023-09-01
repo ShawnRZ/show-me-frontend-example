@@ -33,7 +33,6 @@ export const useMetadataStore = defineStore('metadata', {
                         if (id === 0) {
                             return '';
                         }
-                        console.debug(id, this.tc.runes);
                         return this.tc.runes.get(`${id}`).icon;
                     };
                 default:
@@ -48,7 +47,6 @@ export const useMetadataStore = defineStore('metadata', {
                     return;
                 case 1:
                     return (id) => {
-                        console.debug(id, this.tc.items);
                         if (id === 0) {
                             id = 7050;
                         }
@@ -65,6 +63,9 @@ export const useMetadataStore = defineStore('metadata', {
                     return;
                 case 1:
                     return (id) => {
+                        if (id === 0) {
+                            return '';
+                        }
                         return this.tc.spells.get(`${id}`).icon;
                     };
 
@@ -79,7 +80,6 @@ export const useMetadataStore = defineStore('metadata', {
         },
         getRuneEndOfGameStatDescs() {
             return (id, var1, var2, var3) => {
-                console.debug('getRuneEndOfGameStatDescs', id, this.cd.runes);
                 if (id === 0) {
                     return '未知符文';
                 }
@@ -121,11 +121,14 @@ export const useMetadataStore = defineStore('metadata', {
             switch (config.metadata) {
                 case 0:
                     return (id) => {
-                        const baseUrl = `https://cdn.communitydragon.org/latest/profile-icon/${id}`;
+                        const baseUrl = `https://cdn.communitydragon.org/latest/champion/${id}/square`;
                         return baseUrl;
                     };
                 case 1:
                     return (id) => {
+                        if (id == 0) {
+                            return 'https://cdn.communitydragon.org/latest/champion/None/square'
+                        }
                         const name = this.tc.heros.get(`${id}`).alias;
                         const baseUrl = `https://game.gtimg.cn/images/lol/act/img/champion/${name}.png`;
                         return baseUrl;
@@ -171,7 +174,6 @@ export const useMetadataStore = defineStore('metadata', {
                     const e = perksList[i];
                     this.cd.runes.set(e.id, e);
                 }
-                console.debug('runes_cd', this.cd.runes);
             } catch (error) {
                 throw new Error('runes_cd 初始化失败: ' + error);
             }
@@ -185,7 +187,6 @@ export const useMetadataStore = defineStore('metadata', {
                     const e = perkstylesList[i];
                     this.cd.runestyles.set(e.id, e);
                 }
-                console.debug('runestyles_cd', this.cd.runestyles);
             } catch (error) {
                 throw new Error('runestyles_cd 初始化失败: ' + error);
             }
@@ -199,7 +200,6 @@ export const useMetadataStore = defineStore('metadata', {
                     const e = itemsList[i];
                     this.cd.items.set(e.id, e);
                 }
-                console.debug('items_cd', this.cd.items);
             } catch (error) {
                 throw new Error('items_cd 初始化失败: ' + error);
             }
@@ -213,7 +213,6 @@ export const useMetadataStore = defineStore('metadata', {
                     const e = spellsList[i];
                     this.cd.spells.set(e.id, e);
                 }
-                console.debug('spells_cd', this.cd.spells);
             } catch (error) {
                 throw new Error('spells_cd 初始化失败: ' + error);
             }
@@ -226,7 +225,6 @@ export const useMetadataStore = defineStore('metadata', {
                 for (const [key, value] of Object.entries(queues)) {
                     this.cd.queues.set(key, value);
                 }
-                console.debug('queues_cd', this.cd.queues);
             } catch (error) {
                 throw new Error('queues_cd 初始化失败: ' + error);
             }
@@ -240,7 +238,6 @@ export const useMetadataStore = defineStore('metadata', {
                 res.forEach(h => {
                     this.tc.heros.set(h.heroId, h);
                 });
-                console.debug('heros_tc', this.tc.heros);
             } catch (error) {
                 throw new Error('heros_tc 初始化失败: ' + error);
             }
@@ -253,7 +250,6 @@ export const useMetadataStore = defineStore('metadata', {
                 res.forEach(i => {
                     this.tc.items.set(i.itemId, i);
                 });
-                console.debug('items_tc', this.tc.items);
             } catch (error) {
                 throw new Error('items_tc 初始化失败' + error);
             }
@@ -266,7 +262,6 @@ export const useMetadataStore = defineStore('metadata', {
                 for (const [key, value] of Object.entries(res)) {
                     this.tc.runes.set(key, value);
                 }
-                console.debug('runes_tc', this.tc.runes);
             } catch (error) {
                 throw new Error('runes_tc 初始化失败' + error);
             }
@@ -279,7 +274,6 @@ export const useMetadataStore = defineStore('metadata', {
                 for (const [key, value] of Object.entries(res)) {
                     this.tc.spells.set(key, value);
                 }
-                console.debug('spells_tc', this.tc.spells);
             } catch (error) {
                 throw new Error('spells_tc 初始化失败' + error);
             }

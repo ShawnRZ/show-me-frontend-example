@@ -22,40 +22,14 @@ export async function refreshParameter() {
 
 export async function connect() {
     await invoke("connect");
-    const gf = await listen("Gameflow", async (e) => {
-        console.log(e);
-        switch (e.payload) {
-            case "ChampSelect":
-                const cs = await listen("ChampionSelect", async () => {
-                    const temp = await listen("Gameflow", async (e) => {
-                        cs();
-                        temp();
-                    })
-                    let res = await invoke("get_champ_select_session");
-                    let cs = JSON.parse(res);
-                });
-                break;
-
-            default:
-                cs();
-                console.log("取消监听英雄选择");
-                break;
-        }
-    });
     const cc = await listen("ConnectionClosed", () => {
-        gf();
         cc();
         console.log("断开连接");
     })
 }
 
 export async function getChampSelectSession() {
-    try {
-        let res = await invoke("get_champ_select_session");
-        console.log(res);
-    } catch (err) {
-        console.log(err);
-    }
+    return await invoke("get_champ_select_session");
 }
 
 export async function getCurrentSummoner() {
@@ -92,5 +66,9 @@ export async function testAndSetCer() {
 }
 
 export async function getSummonerById(id) {
-    return await invoke("get_summoner_by_id", { id: id })
+    return await invoke("get_summoner_by_id", { id: parseInt(id) });
+}
+
+export async function getGameflowSession() {
+    return await invoke("get_gameflow_session");
 }

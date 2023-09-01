@@ -120,6 +120,25 @@ async function reConnectToClient() {
         return;
     }
     /**
+     * 监听 Gameflow 事件
+     */
+    const gf = await listen("Gameflow", (e) => {
+        switch (e.payload) {
+            case "ChampSelect":
+                Router.push({
+                    path: '/current'
+                });
+                break;
+            case "GameStart":
+                Router.push({
+                    path: '/current'
+                });
+                break;
+            default:
+                break;
+        }
+    })
+    /**
      * 处理断开连接事件
      */
     const cc = await listen("ConnectionClosed", () => {
@@ -131,6 +150,7 @@ async function reConnectToClient() {
         });
         summoner.value = null;
         cc();
+        gf();
     });
     /**
      * 连接成功
@@ -147,7 +167,12 @@ async function reConnectToClient() {
 
 <template>
     <div class="avatar">
-        <el-avatar :size="50" :src="profileIcon" @click="reConnectToClient()" />
+        <!-- <el-avatar :size="50" :src="profileIcon" @click="reConnectToClient()" /> -->
+        <el-avatar :size="50"
+            :src="'https://riot:X3mVDw6jNEcr18yOIc07aQ@127.0.0.1:51372/lol-game-data/assets/v1/champion-icons/122.png'"
+            @click="reConnectToClient()" />
+        <img src="https://127.0.0.1:51372/lol-game-data/assets/v1/champion-icons/122.png"
+            alt="">
         <div :class="['status', offline ? 'offline' : '']"></div>
         <div class="name">
             <el-tooltip :content="name">
@@ -205,5 +230,4 @@ async function reConnectToClient() {
             cursor: pointer;
         }
     }
-}
-</style>
+}</style>

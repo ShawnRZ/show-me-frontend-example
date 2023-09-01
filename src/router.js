@@ -50,6 +50,15 @@ export const router = createRouter({
                 title: () => import('@/pages/lolaram/title.vue')
             }
         }
+        ,
+        {
+            name: 'current',
+            path: '/current',
+            components: {
+                main: () => import('@/pages/current/index.vue'),
+                title: () => import('@/pages/current/title.vue')
+            }
+        }
     ]
 });
 

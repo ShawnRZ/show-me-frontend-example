@@ -52,8 +52,8 @@ watch(currentPage, async (page, oldPage) => {
     }
     try {
         const m = await getMatchHistoryByPuuid(summoner.value.puuid, (currentPage.value - 1) * 6, (currentPage.value - 1) * 6 + 5);
-        console.debug(m);
         matchHistory.value = m.games.games;
+        console.log(matchHistory.value);
     } catch (error) {
         currentPage.value = oldPage;
         ElNotification.info({
@@ -61,7 +61,6 @@ watch(currentPage, async (page, oldPage) => {
             message: error,
             position: 'bottom-right'
         });
-        return;
     }
 });
 
@@ -69,15 +68,16 @@ const loadData = async () => {
     try {
         let s = null;
         if (Route.query.id) {
+            console.log('id', Route.query.id);
             s = await getSummonerById(Route.query.id);
         } else if (Route.query.name) {
+            console.log('name', Route.query.name);
             s = await getSummonerByName(Route.query.name);
         } else {
             return;
         }
-        console.debug(Route.query);
-        console.debug(s);
         summoner.value = s;
+        console.log(summoner.value);
     } catch (error) {
         ElNotification.info({
             title: '查询失败',
@@ -87,32 +87,28 @@ const loadData = async () => {
         return;
     }
 
-    try {
-        const r = await getRankedStats(summoner.value.puuid);
-        console.debug(r);
+    getRankedStats(summoner.value.puuid).then((r) => {
         rankedStats.value = r;
-    } catch (error) {
+        console.log(rankedStats.value);
+    }).catch((error) => {
         ElNotification.info({
             title: '无法查询段位信息',
             message: error,
             position: 'bottom-right'
         });
-        return;
-    }
+    });
 
     if (currentPage.value === 1) {
-        try {
-            const m = await getMatchHistoryByPuuid(summoner.value.puuid, 0, 5);
-            console.debug(m);
+        getMatchHistoryByPuuid(summoner.value.puuid, 0, 5).then((m) => {
             matchHistory.value = m.games.games;
-        } catch (error) {
+            console.log(matchHistory.value);
+        }).catch((error) => {
             ElNotification.info({
                 title: '无法查询战绩信息',
                 message: error,
                 position: 'bottom-right'
             });
-            return;
-        }
+        })
     } else {
         currentPage.value = 1;
     }
@@ -131,12 +127,11 @@ watch(
         currentPage.value = 1;
         gameId.value = 0;
         await loadData();
-
     },
     {
         immediate: true,
-        deep: true,
-    });
+    }
+);
 
 const copyMyName = () => {
     navigator.clipboard.writeText(summoner.value.displayName).then(() => {
